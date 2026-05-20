@@ -1,6 +1,17 @@
 // @ts-check
 /** @type {import('@yarnpkg/types')} */
-const { defineConfig, Yarn } = require('@yarnpkg/types');
+
+// `@yarnpkg/types` is a devDependency. Production pruning (e.g. Scalingo's
+// `yarn heroku prune`) removes it, but yarn's post-install validation still
+// loads this file. Guard the require so a no-op export keeps validation green.
+let defineConfig;
+try {
+  ({ defineConfig } = require('@yarnpkg/types'));
+} catch (e) {
+  module.exports = {};
+  return;
+}
+
 const semver = require('semver');
 
 const MONOREPO_ROOT_WORKSPACE = 'twenty';
